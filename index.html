@@ -28,6 +28,9 @@
     <style id="cfo-hero-chip-refinement">
       @keyframes cfoHeroChipPulse{0%{transform:scale(.86);opacity:.5}70%,100%{transform:scale(2.08);opacity:0}}.cfo-hero-chip-row{display:flex;width:100%;flex-wrap:wrap;align-items:center;gap:.75rem;margin-bottom:1.75rem}.cfo-hero-chip{box-sizing:border-box;display:inline-flex;height:46px;max-width:100%;align-items:center;gap:.8rem;border-radius:9999px;border:2px solid rgba(16,185,129,.95);background:linear-gradient(135deg,rgba(236,253,245,.96),rgba(209,250,229,.9));padding:.72rem 1.75rem;color:#064e3b;box-shadow:0 0 0 1px rgba(52,245,161,.35),0 0 28px rgba(52,245,161,.55),0 16px 38px rgba(6,95,70,.22),inset 0 1px 0 rgba(255,255,255,.95);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}.cfo-hero-chip-dot{position:relative;display:inline-flex;height:12px;width:12px;flex:0 0 auto;border-radius:9999px;background:#10b981;box-shadow:0 0 0 4px rgba(52,245,161,.16),0 0 18px rgba(52,245,161,.95)}.cfo-hero-chip-dot--active{background:#10b981;box-shadow:0 0 0 4px rgba(52,245,161,.16),0 0 18px rgba(52,245,161,.95)}.cfo-hero-chip-dot--active:before{content:"";position:absolute;inset:0;border-radius:inherit;background:rgba(52,245,161,.62);animation:cfoHeroChipPulse 2.8s cubic-bezier(0,0,.2,1) infinite}.cfo-hero-chip-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;font-weight:800;line-height:1;letter-spacing:.08em;color:#064e3b}@media (max-width:639px){.cfo-hero-chip{height:44px;padding:.68rem 1.25rem}.cfo-hero-chip-text{font-size:13px}}@media (prefers-reduced-motion:reduce){.cfo-hero-chip-dot--active:before{animation:none}}
     </style>
+    <style id="cfo-free-download-modal-styles">
+      .cfo-lead-modal{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:1.25rem;background:rgba(2,6,23,.42);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);opacity:1;transition:opacity .2s ease}.cfo-lead-modal[hidden]{display:none}.cfo-lead-modal__panel{position:relative;width:min(100%,31rem);overflow:hidden;border-radius:2rem;border:1px solid rgba(16,185,129,.28);background:linear-gradient(145deg,rgba(255,255,255,.96),rgba(236,253,245,.9));box-shadow:0 2rem 5rem rgba(15,23,42,.28),0 0 3rem rgba(52,245,161,.2),inset 0 1px 0 rgba(255,255,255,.92);color:#0f172a}.cfo-lead-modal__panel:before{content:"";position:absolute;inset:-35% -20% auto auto;height:16rem;width:16rem;border-radius:9999px;background:radial-gradient(circle,rgba(52,245,161,.28),transparent 68%);pointer-events:none}.cfo-lead-modal__body{position:relative;padding:1.5rem}.cfo-lead-modal__close{position:absolute;right:1rem;top:1rem;display:inline-flex;height:2.25rem;width:2.25rem;align-items:center;justify-content:center;border-radius:9999px;border:1px solid rgba(15,23,42,.08);background:rgba(255,255,255,.7);color:#334155;transition:background .2s ease,color .2s ease,transform .2s ease}.cfo-lead-modal__close:hover{background:#fff;color:#020617;transform:translateY(-1px)}.cfo-lead-modal__eyebrow{display:inline-flex;align-items:center;gap:.5rem;border-radius:9999px;border:1px solid rgba(16,185,129,.32);background:rgba(236,253,245,.82);padding:.4rem .75rem;font-size:.7rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#065f46}.cfo-lead-modal__eyebrow:before{content:"";height:.55rem;width:.55rem;border-radius:9999px;background:#10b981;box-shadow:0 0 1rem rgba(52,245,161,.8)}.cfo-lead-modal__title{margin-top:1rem;font-size:1.875rem;font-weight:400;line-height:1.05;letter-spacing:-.03em;color:#020617}.cfo-lead-modal__copy{margin-top:.75rem;font-size:.95rem;line-height:1.7;color:#475569}.cfo-lead-modal__form{margin-top:1.25rem;display:grid;gap:1rem}.cfo-lead-modal__field{display:grid;gap:.45rem}.cfo-lead-modal__label{font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#064e3b}.cfo-lead-modal__input{width:100%;border-radius:1rem;border:1px solid rgba(16,185,129,.22);background:rgba(255,255,255,.78);padding:.9rem 1rem;font-size:1rem;color:#0f172a;outline:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.82);transition:border-color .2s ease,box-shadow .2s ease}.cfo-lead-modal__input:focus{border-color:rgba(16,185,129,.75);box-shadow:0 0 0 4px rgba(52,245,161,.18),inset 0 1px 0 rgba(255,255,255,.9)}.cfo-lead-modal__error{min-height:1.1rem;font-size:.78rem;color:#b91c1c}.cfo-lead-modal__submit{display:inline-flex;min-height:3.15rem;align-items:center;justify-content:center;border-radius:9999px;background:linear-gradient(135deg,#7dffd8 0%,#34F5A1 48%,#10B981 100%);padding:.9rem 1.2rem;font-size:.95rem;font-weight:800;color:#052e2b;box-shadow:0 1.35rem 3.25rem -1.15rem rgba(52,245,161,.56),inset 0 1px 0 rgba(255,255,255,.55);transition:transform .2s ease,opacity .2s ease}.cfo-lead-modal__submit:hover{transform:translateY(-1px)}.cfo-lead-modal__submit:disabled{cursor:not-allowed;opacity:.72;transform:none}.cfo-lead-modal__status{min-height:1.25rem;font-size:.85rem;color:#b91c1c}.cfo-lead-modal__success{margin-top:1.25rem;border-radius:1.35rem;border:1px solid rgba(16,185,129,.26);background:rgba(236,253,245,.82);padding:1rem;font-size:1rem;font-weight:700;line-height:1.6;color:#065f46;box-shadow:inset 0 1px 0 rgba(255,255,255,.86)}@media (min-width:640px){.cfo-lead-modal__body{padding:2rem}.cfo-lead-modal__title{font-size:2.25rem}}@media (prefers-reduced-motion:reduce){.cfo-lead-modal,.cfo-lead-modal__close,.cfo-lead-modal__input,.cfo-lead-modal__submit{transition:none}}
+    </style>
   </head>
 
   <body class="bg-sky-50 text-slate-950 antialiased selection:bg-emerald-200 selection:text-emerald-950 overflow-x-hidden" style="font-family:'DM Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
@@ -138,7 +141,7 @@
                 <iconify-icon icon="solar:bolt-linear" stroke-width="1.5" class="text-lg transition group-hover:translate-x-0.5"></iconify-icon>
               </a>
               <a href="#products" class="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white/70 px-6 py-3.5 text-sm font-medium text-slate-700 shadow-xl shadow-slate-900/5 backdrop-blur-xl transition hover:-translate-y-0.5 hover:text-slate-950 cfo-control-cta cfo-control-secondary">
-                Download free sheet
+                Get Free Job Cost Tracker
                 <iconify-icon icon="solar:download-linear" stroke-width="1.5" class="text-lg"></iconify-icon>
               </a>
             </div>
@@ -460,7 +463,7 @@
                     </div>
                   </div>
                 </div>
-                <a id="download-free-job-cost-tracker" href="/downloads/job-cost-tracker.xlsx" class="js-free-download mt-8 inline-flex items-center justify-center gap-2 rounded-full bg-emerald-400 px-6 py-3.5 text-sm font-medium text-emerald-950 shadow-2xl shadow-emerald-500/25 transition hover:-translate-y-0.5 hover:bg-emerald-300">
+                <a id="download-free-job-cost-tracker" href="#free-job-cost-tracker" class="js-free-download mt-8 inline-flex items-center justify-center gap-2 rounded-full bg-emerald-400 px-6 py-3.5 text-sm font-medium text-emerald-950 shadow-2xl shadow-emerald-500/25 transition hover:-translate-y-0.5 hover:bg-emerald-300">
                   Download Free Job Cost Tracker
                   <iconify-icon icon="solar:download-linear" stroke-width="1.5" class="text-lg"></iconify-icon>
                 </a>
@@ -1200,8 +1203,8 @@
               </p>
 
               <div class="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
-                <a id="download-free-weekly-cash-flow-sheet" href="/downloads/job-cost-tracker.xlsx" class="js-free-download inline-flex items-center justify-center gap-2 rounded-full bg-slate-950 px-6 py-3.5 text-sm font-medium text-white shadow-2xl shadow-slate-900/15 transition hover:-translate-y-0.5 hover:bg-emerald-600">
-                  Download Free Weekly Cash Flow Sheet
+                <a id="download-free-weekly-cash-flow-sheet" href="#free-job-cost-tracker" class="js-free-download inline-flex items-center justify-center gap-2 rounded-full bg-slate-950 px-6 py-3.5 text-sm font-medium text-white shadow-2xl shadow-slate-900/15 transition hover:-translate-y-0.5 hover:bg-emerald-600">
+                  Get Free Job Cost Tracker
                   <iconify-icon icon="solar:download-linear" stroke-width="1.5" class="text-lg"></iconify-icon>
                 </a>
                 <!-- Stripe/payment integration hook: route this CTA to the Contractor Cash Control Bundle purchase flow when checkout is live. -->
@@ -1246,6 +1249,47 @@
         </div>
       </div>
     </footer>
+
+    <div id="free-download-modal" class="cfo-lead-modal" hidden aria-hidden="true">
+      <div class="cfo-lead-modal__panel" role="dialog" aria-modal="true" aria-labelledby="free-download-modal-title">
+        <div class="cfo-lead-modal__body">
+          <button type="button" class="cfo-lead-modal__close" data-free-download-close aria-label="Close free download form">
+            <iconify-icon icon="solar:close-circle-linear" stroke-width="1.5" class="text-xl"></iconify-icon>
+          </button>
+
+          <div class="cfo-lead-modal__eyebrow">Free tracker</div>
+          <h2 id="free-download-modal-title" class="cfo-lead-modal__title">
+            Get the free Job Cost Tracker.
+          </h2>
+          <p class="cfo-lead-modal__copy">
+            We’ll send the download link to your email.
+          </p>
+
+          <form id="free-download-form" class="cfo-lead-modal__form" novalidate>
+            <div class="cfo-lead-modal__field">
+              <label class="cfo-lead-modal__label" for="free-download-name">Full Name</label>
+              <input id="free-download-name" name="name" class="cfo-lead-modal__input" type="text" autocomplete="name" required>
+              <div id="free-download-name-error" class="cfo-lead-modal__error" aria-live="polite"></div>
+            </div>
+
+            <div class="cfo-lead-modal__field">
+              <label class="cfo-lead-modal__label" for="free-download-email">Email Address</label>
+              <input id="free-download-email" name="email" class="cfo-lead-modal__input" type="email" autocomplete="email" required>
+              <div id="free-download-email-error" class="cfo-lead-modal__error" aria-live="polite"></div>
+            </div>
+
+            <button id="free-download-submit" type="submit" class="cfo-lead-modal__submit">
+              Send Me the Free Job Cost Tracker
+            </button>
+            <div id="free-download-status" class="cfo-lead-modal__status" aria-live="polite"></div>
+          </form>
+
+          <div id="free-download-success" class="cfo-lead-modal__success" hidden>
+            Check your email — your free Job Cost Tracker is on the way.
+          </div>
+        </div>
+      </div>
+    </div>
 
     <script>
       const scenarios = {
@@ -1309,6 +1353,125 @@
           activeIcon.classList.remove("text-slate-500");
           activeIcon.classList.add("text-emerald-600");
         });
+      });
+
+      const freeDownloadModal = document.getElementById("free-download-modal");
+      const freeDownloadForm = document.getElementById("free-download-form");
+      const freeDownloadName = document.getElementById("free-download-name");
+      const freeDownloadEmail = document.getElementById("free-download-email");
+      const freeDownloadSubmit = document.getElementById("free-download-submit");
+      const freeDownloadStatus = document.getElementById("free-download-status");
+      const freeDownloadSuccess = document.getElementById("free-download-success");
+      const freeDownloadNameError = document.getElementById("free-download-name-error");
+      const freeDownloadEmailError = document.getElementById("free-download-email-error");
+      let freeDownloadLastFocus = null;
+
+      const isValidLeadEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+      const resetFreeDownloadForm = () => {
+        freeDownloadForm.reset();
+        freeDownloadForm.hidden = false;
+        freeDownloadSuccess.hidden = true;
+        freeDownloadNameError.textContent = "";
+        freeDownloadEmailError.textContent = "";
+        freeDownloadStatus.textContent = "";
+        freeDownloadSubmit.disabled = false;
+        freeDownloadSubmit.textContent = "Send Me the Free Job Cost Tracker";
+      };
+
+      const openFreeDownloadModal = () => {
+        freeDownloadLastFocus = document.activeElement;
+        resetFreeDownloadForm();
+        freeDownloadModal.hidden = false;
+        freeDownloadModal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+        window.setTimeout(() => freeDownloadName.focus(), 0);
+      };
+
+      const closeFreeDownloadModal = () => {
+        freeDownloadModal.hidden = true;
+        freeDownloadModal.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+        if (freeDownloadLastFocus && typeof freeDownloadLastFocus.focus === "function") {
+          freeDownloadLastFocus.focus();
+        }
+      };
+
+      document.querySelectorAll(".js-free-download").forEach((link) => {
+        link.addEventListener("click", (event) => {
+          event.preventDefault();
+          openFreeDownloadModal();
+        });
+      });
+
+      document.querySelectorAll("[data-free-download-close]").forEach((button) => {
+        button.addEventListener("click", closeFreeDownloadModal);
+      });
+
+      freeDownloadModal.addEventListener("click", (event) => {
+        if (event.target === freeDownloadModal) {
+          closeFreeDownloadModal();
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !freeDownloadModal.hidden) {
+          closeFreeDownloadModal();
+        }
+      });
+
+      freeDownloadForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const name = freeDownloadName.value.trim();
+        const email = freeDownloadEmail.value.trim();
+        let hasError = false;
+
+        freeDownloadNameError.textContent = "";
+        freeDownloadEmailError.textContent = "";
+        freeDownloadStatus.textContent = "";
+
+        if (!name) {
+          freeDownloadNameError.textContent = "Please enter your name.";
+          hasError = true;
+        }
+
+        if (!isValidLeadEmail(email)) {
+          freeDownloadEmailError.textContent = "Please enter a valid email address.";
+          hasError = true;
+        }
+
+        if (hasError) {
+          return;
+        }
+
+        freeDownloadSubmit.disabled = true;
+        freeDownloadSubmit.textContent = "Sending...";
+
+        try {
+          const response = await fetch("/.netlify/functions/free-download-lead", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              name,
+              email,
+              product: "free-job-cost-tracker"
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error("Lead request failed");
+          }
+
+          freeDownloadForm.hidden = true;
+          freeDownloadSuccess.hidden = false;
+        } catch (error) {
+          freeDownloadStatus.textContent = "Something went wrong. Please try again.";
+          freeDownloadSubmit.disabled = false;
+          freeDownloadSubmit.textContent = "Send Me the Free Job Cost Tracker";
+        }
       });
     </script>
   
