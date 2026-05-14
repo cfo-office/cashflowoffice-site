@@ -1491,6 +1491,46 @@
           freeDownloadSubmit.textContent = "Send Me the Free Job Cost Tracker";
         }
       });
+
+      document.querySelectorAll(".js-stripe-checkout").forEach((link) => {
+        link.addEventListener("click", async (event) => {
+          event.preventDefault();
+
+          const originalContent = link.innerHTML;
+          link.setAttribute("aria-disabled", "true");
+          link.style.pointerEvents = "none";
+
+          try {
+            const response = await fetch("/.netlify/functions/create-checkout-session", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                product: "cashflowoffice-weekly-finance-bundle"
+              })
+            });
+
+            if (!response.ok) {
+              throw new Error("Checkout session request failed");
+            }
+
+            const result = await response.json();
+
+            if (!result.checkoutUrl) {
+              throw new Error("Checkout URL missing from response");
+            }
+
+            window.location.href = result.checkoutUrl;
+          } catch (error) {
+            console.error("Cash Flow Office bundle checkout failed", error);
+            link.innerHTML = originalContent;
+            link.removeAttribute("aria-disabled");
+            link.style.pointerEvents = "";
+            window.alert("Something went wrong starting checkout. Please try again.");
+          }
+        });
+      });
     </script>
   
 </body></html>
