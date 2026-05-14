@@ -125,7 +125,7 @@ const buildDownloadEmail = ({ name, downloadUrl }) => {
                 <p style="margin:0 0 26px;font-size:14px;line-height:1.6;color:#065f46;">
                   This secure download link expires in 10 minutes.
                 </p>
-                <a href="${safeDownloadUrl}" style="display:inline-block;border-radius:999px;background:linear-gradient(135deg,#7dffd8 0%,#34F5A1 48%,#10B981 100%);padding:15px 22px;color:#052e2b;text-decoration:none;font-size:15px;font-weight:800;box-shadow:0 18px 34px rgba(52,245,161,.32);">
+                <a href="${safeDownloadUrl}" style="display:inline-block;border-radius:999px;background:linear-gradient(135deg,#7dffd8 0%,#34F5A1 48%,#10B981 100%);padding:15px 22px;color:#061218;text-decoration:none;font-size:15px;font-weight:800;box-shadow:0 18px 34px rgba(52,245,161,.32);">
                   Download the Job Cost Tracker
                 </a>
                 <p style="margin:26px 0 0;font-size:13px;line-height:1.6;color:#64748b;">
