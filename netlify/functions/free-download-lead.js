@@ -126,7 +126,7 @@ const buildDownloadEmail = ({ name, downloadUrl }) => {
                   This secure download link expires in 10 minutes.
                 </p>
                 <a href="${safeDownloadUrl}" style="display:inline-block;border-radius:999px;background:linear-gradient(135deg,#7dffd8 0%,#34F5A1 48%,#10B981 100%);padding:15px 22px;color: #061218 !important;-webkit-text-fill-color: #061218 !important;text-decoration:none;font-size:15px;font-weight:800;box-shadow:0 18px 34px rgba(52,245,161,.32);">
-                  Download the Job Cost Tracker
+                  <span style="color: #061218 !important;-webkit-text-fill-color: #061218 !important;font-weight:700;">Download the Job Cost Tracker</span>
                 </a>
                 <p style="margin:26px 0 0;font-size:13px;line-height:1.6;color:#64748b;">
                   If the button does not work, copy and paste this link into your browser:<br>
