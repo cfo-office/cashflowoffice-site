@@ -1267,6 +1267,22 @@
             <a href="#cta" class="transition hover:text-slate-950">Start</a>
           </div>
         </div>
+        <div class="mt-8 rounded-[1.5rem] border border-emerald-200 bg-emerald-50/70 p-5 shadow-xl shadow-emerald-900/5">
+          <div class="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h2 class="text-xl font-normal tracking-tight text-slate-950">
+                Have a question before you download?
+              </h2>
+              <p class="mt-2 max-w-xl text-sm font-normal leading-7 text-slate-600">
+                Contact Darlene at Cash Flow Office and we’ll respond by email.
+              </p>
+            </div>
+            <button type="button" id="contact-darlene-open" class="inline-flex items-center justify-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-medium text-white shadow-xl shadow-slate-900/10 transition hover:-translate-y-0.5 hover:bg-emerald-600">
+              Contact Darlene
+              <iconify-icon icon="solar:letter-linear" stroke-width="1.5" class="text-lg"></iconify-icon>
+            </button>
+          </div>
+        </div>
         <div class="mt-8 border-t border-slate-200 pt-6 text-xs font-normal text-slate-400">
           © 2026 Cash Flow Office. All rights reserved.
         </div>
@@ -1344,6 +1360,65 @@
             <a id="paid-download-now" class="cfo-lead-modal__download" href="#" target="_blank" rel="noopener" aria-disabled="true">
               Download Your Cash Flow Office Bundle
             </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="contact-modal" class="cfo-lead-modal" hidden aria-hidden="true">
+      <div class="cfo-lead-modal__panel" role="dialog" aria-modal="true" aria-labelledby="contact-modal-title">
+        <div class="cfo-lead-modal__body">
+          <button type="button" class="cfo-lead-modal__close" data-contact-close aria-label="Close contact form">
+            <iconify-icon icon="solar:close-circle-linear" stroke-width="1.5" class="text-xl"></iconify-icon>
+          </button>
+
+          <div class="cfo-lead-modal__eyebrow">Contact</div>
+          <h2 id="contact-modal-title" class="cfo-lead-modal__title">
+            Contact Darlene at Cash Flow Office
+          </h2>
+          <p class="cfo-lead-modal__copy">
+            Send a quick note and we’ll respond by email. For download issues, include the email used at checkout so we can help faster.
+          </p>
+
+          <form id="contact-form" class="cfo-lead-modal__form" novalidate>
+            <div class="cfo-lead-modal__field">
+              <label class="cfo-lead-modal__label" for="contact-name">Full Name</label>
+              <input id="contact-name" name="name" class="cfo-lead-modal__input" type="text" autocomplete="name" required>
+              <div id="contact-name-error" class="cfo-lead-modal__error" aria-live="polite"></div>
+            </div>
+
+            <div class="cfo-lead-modal__field">
+              <label class="cfo-lead-modal__label" for="contact-email">Email Address</label>
+              <input id="contact-email" name="email" class="cfo-lead-modal__input" type="email" autocomplete="email" required>
+              <div id="contact-email-error" class="cfo-lead-modal__error" aria-live="polite"></div>
+            </div>
+
+            <div class="cfo-lead-modal__field">
+              <label class="cfo-lead-modal__label" for="contact-topic">What do you need help with?</label>
+              <select id="contact-topic" name="topic" class="cfo-lead-modal__input" required>
+                <option value="">Select a topic</option>
+                <option value="Free Job Cost Tracker">Free Job Cost Tracker</option>
+                <option value="Cash Flow Office Bundle">Cash Flow Office Bundle</option>
+                <option value="Download issue">Download issue</option>
+                <option value="Other question">Other question</option>
+              </select>
+              <div id="contact-topic-error" class="cfo-lead-modal__error" aria-live="polite"></div>
+            </div>
+
+            <div class="cfo-lead-modal__field">
+              <label class="cfo-lead-modal__label" for="contact-message">Message</label>
+              <textarea id="contact-message" name="message" class="cfo-lead-modal__input min-h-[7rem] resize-y" required></textarea>
+              <div id="contact-message-error" class="cfo-lead-modal__error" aria-live="polite"></div>
+            </div>
+
+            <button id="contact-submit" type="submit" class="cfo-lead-modal__submit">
+              Send Message
+            </button>
+            <div id="contact-status" class="cfo-lead-modal__status" aria-live="polite"></div>
+          </form>
+
+          <div id="contact-success" class="cfo-lead-modal__success" hidden>
+            Thanks — your message has been received. We’ll respond by email.
           </div>
         </div>
       </div>
@@ -1429,6 +1504,21 @@
       const paidDownloadStatus = document.getElementById("paid-download-status");
       const paidDownloadNow = document.getElementById("paid-download-now");
       let paidDownloadLastFocus = null;
+      const contactOpen = document.getElementById("contact-darlene-open");
+      const contactModal = document.getElementById("contact-modal");
+      const contactForm = document.getElementById("contact-form");
+      const contactName = document.getElementById("contact-name");
+      const contactEmail = document.getElementById("contact-email");
+      const contactTopic = document.getElementById("contact-topic");
+      const contactMessage = document.getElementById("contact-message");
+      const contactSubmit = document.getElementById("contact-submit");
+      const contactStatus = document.getElementById("contact-status");
+      const contactSuccess = document.getElementById("contact-success");
+      const contactNameError = document.getElementById("contact-name-error");
+      const contactEmailError = document.getElementById("contact-email-error");
+      const contactTopicError = document.getElementById("contact-topic-error");
+      const contactMessageError = document.getElementById("contact-message-error");
+      let contactLastFocus = null;
 
       const isValidLeadEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -1488,6 +1578,37 @@
         }
       };
 
+      const resetContactForm = () => {
+        contactForm.reset();
+        contactForm.hidden = false;
+        contactSuccess.hidden = true;
+        contactNameError.textContent = "";
+        contactEmailError.textContent = "";
+        contactTopicError.textContent = "";
+        contactMessageError.textContent = "";
+        contactStatus.textContent = "";
+        contactSubmit.disabled = false;
+        contactSubmit.textContent = "Send Message";
+      };
+
+      const openContactModal = () => {
+        contactLastFocus = document.activeElement;
+        resetContactForm();
+        contactModal.hidden = false;
+        contactModal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+        window.setTimeout(() => contactName.focus(), 0);
+      };
+
+      const closeContactModal = () => {
+        contactModal.hidden = true;
+        contactModal.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+        if (contactLastFocus && typeof contactLastFocus.focus === "function") {
+          contactLastFocus.focus();
+        }
+      };
+
       const loadPaidBundleDownload = async (sessionId) => {
         try {
           const response = await fetch("/.netlify/functions/paid-download-session", {
@@ -1536,6 +1657,12 @@
         button.addEventListener("click", closePaidDownloadModal);
       });
 
+      contactOpen.addEventListener("click", openContactModal);
+
+      document.querySelectorAll("[data-contact-close]").forEach((button) => {
+        button.addEventListener("click", closeContactModal);
+      });
+
       freeDownloadModal.addEventListener("click", (event) => {
         if (event.target === freeDownloadModal) {
           closeFreeDownloadModal();
@@ -1545,6 +1672,12 @@
       paidDownloadModal.addEventListener("click", (event) => {
         if (event.target === paidDownloadModal) {
           closePaidDownloadModal();
+        }
+      });
+
+      contactModal.addEventListener("click", (event) => {
+        if (event.target === contactModal) {
+          closeContactModal();
         }
       });
 
@@ -1560,6 +1693,9 @@
         }
         if (event.key === "Escape" && !paidDownloadModal.hidden) {
           closePaidDownloadModal();
+        }
+        if (event.key === "Escape" && !contactModal.hidden) {
+          closeContactModal();
         }
       });
 
@@ -1623,6 +1759,77 @@
           freeDownloadStatus.textContent = "Something went wrong. Please try again.";
           freeDownloadSubmit.disabled = false;
           freeDownloadSubmit.textContent = "Send Me the Free Job Cost Tracker";
+        }
+      });
+
+      contactForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const name = contactName.value.trim();
+        const email = contactEmail.value.trim();
+        const topic = contactTopic.value.trim();
+        const message = contactMessage.value.trim();
+        let hasError = false;
+
+        contactNameError.textContent = "";
+        contactEmailError.textContent = "";
+        contactTopicError.textContent = "";
+        contactMessageError.textContent = "";
+        contactStatus.textContent = "";
+
+        if (!name) {
+          contactNameError.textContent = "Please enter your name.";
+          hasError = true;
+        }
+
+        if (!isValidLeadEmail(email)) {
+          contactEmailError.textContent = "Please enter a valid email address.";
+          hasError = true;
+        }
+
+        if (!topic) {
+          contactTopicError.textContent = "Please choose a topic.";
+          hasError = true;
+        }
+
+        if (!message) {
+          contactMessageError.textContent = "Please enter a message.";
+          hasError = true;
+        }
+
+        if (hasError) {
+          return;
+        }
+
+        contactSubmit.disabled = true;
+        contactSubmit.textContent = "Sending...";
+
+        try {
+          const response = await fetch("/.netlify/functions/contact-message", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              name,
+              email,
+              topic,
+              message,
+              source: "cashflowoffice-homepage-contact"
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error("Contact request failed");
+          }
+
+          contactForm.hidden = true;
+          contactSuccess.hidden = false;
+        } catch (error) {
+          console.error("Cash Flow Office contact submission failed", error);
+          contactStatus.textContent = "Something went wrong. Please try again.";
+          contactSubmit.disabled = false;
+          contactSubmit.textContent = "Send Message";
         }
       });
 
