@@ -17,12 +17,28 @@ const jsonResponse = (statusCode, body) => ({
   body: JSON.stringify(body)
 });
 
-const getSupabaseClient = () => {
+const createRequestId = () => {
+  return `lead_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+};
+
+const logEvent = (level, event, details = {}) => {
+  const logger = console[level] || console.log;
+  logger(`[free-download-lead] ${event}`, details);
+};
+
+const safeError = (error) => ({
+  name: error?.name,
+  message: error?.message,
+  stack: error?.stack
+});
+
+const getSupabaseClient = (requestId) => {
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseSecretKey = process.env.SUPABASE_SECRET_KEY;
 
   if (!supabaseUrl || !supabaseSecretKey) {
-    console.error("Missing Supabase environment variables for free download lead function", {
+    logEvent("error", "supabase_env_missing", {
+      requestId,
       hasSupabaseUrl: Boolean(supabaseUrl),
       hasSupabaseSecretKey: Boolean(supabaseSecretKey)
     });
@@ -145,11 +161,16 @@ const isDomainVerificationError = ({ status, body }) => {
   return status === 403 || message.includes("domain") || message.includes("verify") || message.includes("verified");
 };
 
-const sendResendEmail = async ({ from, to, name, downloadUrl }) => {
+const sendResendEmail = async ({ from, to, name, downloadUrl, requestId }) => {
   const resendApiKey = process.env.RESEND_API_KEY;
 
+  logEvent("info", "resend_config_check", {
+    requestId,
+    hasResendApiKey: Boolean(resendApiKey)
+  });
+
   if (!resendApiKey) {
-    console.warn("Missing RESEND_API_KEY; skipping free download email");
+    logEvent("warn", "resend_missing_api_key", { requestId });
     return {
       sent: false,
       sender: null,
@@ -158,22 +179,69 @@ const sendResendEmail = async ({ from, to, name, downloadUrl }) => {
   }
 
   const email = buildDownloadEmail({ name, downloadUrl });
-  const response = await fetch(resendEndpoint, {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${resendApiKey}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      from,
-      to,
-      subject: emailSubject,
-      html: email.html,
-      text: email.text
-    })
+  const resendPayload = {
+    from,
+    to,
+    subject: emailSubject,
+    html: email.html,
+    text: email.text
+  };
+
+  logEvent("info", "resend_sender_selected", {
+    requestId,
+    sender: from,
+    recipient: to
   });
 
-  const body = await parseResendResponse(response);
+  logEvent("info", "resend_request_payload", {
+    requestId,
+    payload: {
+      from: resendPayload.from,
+      to: resendPayload.to,
+      subject: resendPayload.subject,
+      hasHtml: Boolean(resendPayload.html),
+      hasText: Boolean(resendPayload.text),
+      htmlLength: resendPayload.html.length,
+      textLength: resendPayload.text.length,
+      downloadUrlIncludedInEmail: Boolean(downloadUrl)
+    }
+  });
+
+  let response;
+  let body;
+
+  try {
+    response = await fetch(resendEndpoint, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${resendApiKey}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(resendPayload)
+    });
+
+    body = await parseResendResponse(response);
+  } catch (error) {
+    logEvent("error", "resend_request_threw", {
+      requestId,
+      sender: from,
+      error: safeError(error)
+    });
+
+    return {
+      sent: false,
+      sender: from,
+      warning: "Email delivery request failed before Resend returned a response."
+    };
+  }
+
+  logEvent("info", "resend_api_response", {
+    requestId,
+    sender: from,
+    status: response.status,
+    ok: response.ok,
+    body
+  });
 
   if (!response.ok) {
     return {
@@ -192,16 +260,18 @@ const sendResendEmail = async ({ from, to, name, downloadUrl }) => {
   };
 };
 
-const sendDownloadEmail = async ({ name, email, downloadUrl }) => {
+const sendDownloadEmail = async ({ name, email, downloadUrl, requestId }) => {
   const primaryResult = await sendResendEmail({
     from: primarySender,
     to: email,
     name,
-    downloadUrl
+    downloadUrl,
+    requestId
   });
 
   if (primaryResult.sent) {
-    console.info("Sent Job Cost Tracker email", {
+    logEvent("info", "resend_email_sent", {
+      requestId,
       sender: primaryResult.sender,
       resendId: primaryResult.id,
       recipientDomain: email.split("@")[1]
@@ -209,7 +279,8 @@ const sendDownloadEmail = async ({ name, email, downloadUrl }) => {
     return primaryResult;
   }
 
-  console.warn("Primary Resend sender failed for Job Cost Tracker email", {
+  logEvent("warn", "resend_primary_sender_failed", {
+    requestId,
     sender: primaryResult.sender,
     status: primaryResult.status,
     warning: primaryResult.warning,
@@ -224,11 +295,13 @@ const sendDownloadEmail = async ({ name, email, downloadUrl }) => {
     from: fallbackSender,
     to: email,
     name,
-    downloadUrl
+    downloadUrl,
+    requestId
   });
 
   if (fallbackResult.sent) {
-    console.info("Sent Job Cost Tracker email with fallback sender", {
+    logEvent("info", "resend_email_sent_with_fallback_sender", {
+      requestId,
       sender: fallbackResult.sender,
       resendId: fallbackResult.id,
       recipientDomain: email.split("@")[1]
@@ -239,7 +312,8 @@ const sendDownloadEmail = async ({ name, email, downloadUrl }) => {
     };
   }
 
-  console.error("Fallback Resend sender failed for Job Cost Tracker email", {
+  logEvent("error", "resend_fallback_sender_failed", {
+    requestId,
     sender: fallbackResult.sender,
     status: fallbackResult.status,
     warning: fallbackResult.warning,
@@ -250,7 +324,19 @@ const sendDownloadEmail = async ({ name, email, downloadUrl }) => {
 };
 
 exports.handler = async (event) => {
+  const requestId = createRequestId();
+
+  logEvent("info", "function_start", {
+    requestId,
+    httpMethod: event.httpMethod
+  });
+
   if (event.httpMethod !== "POST") {
+    logEvent("warn", "method_not_allowed", {
+      requestId,
+      httpMethod: event.httpMethod
+    });
+
     return {
       statusCode: 405,
       headers: {
@@ -266,7 +352,10 @@ exports.handler = async (event) => {
   try {
     payload = JSON.parse(event.body || "{}");
   } catch (error) {
-    console.warn("Invalid JSON submitted to free download lead function");
+    logEvent("warn", "payload_json_parse_failed", {
+      requestId,
+      error: safeError(error)
+    });
     return jsonResponse(400, { error: "Invalid JSON" });
   }
 
@@ -274,8 +363,18 @@ exports.handler = async (event) => {
   const email = typeof payload.email === "string" ? payload.email.trim() : "";
   const product = typeof payload.product === "string" ? payload.product.trim() : "";
 
+  logEvent("info", "incoming_payload", {
+    requestId,
+    payload: {
+      name,
+      email,
+      product
+    }
+  });
+
   if (!name || !emailPattern.test(email) || product !== "free-job-cost-tracker") {
-    console.warn("Invalid free download lead fields", {
+    logEvent("warn", "validation_failed", {
+      requestId,
       hasName: Boolean(name),
       hasValidEmail: emailPattern.test(email),
       product
@@ -283,16 +382,29 @@ exports.handler = async (event) => {
     return jsonResponse(400, { error: "Missing or invalid lead fields" });
   }
 
+  logEvent("info", "validation_passed", {
+    requestId,
+    product,
+    recipientDomain: email.split("@")[1]
+  });
+
   // TODO: Store the lead in the CRM, database, or email marketing platform.
 
-  const supabase = getSupabaseClient();
+  const supabase = getSupabaseClient(requestId);
 
   if (!supabase) {
+    logEvent("error", "supabase_client_unavailable", { requestId });
     return jsonResponse(500, { error: "Download service is not configured" });
   }
 
   try {
     const downloadPath = await resolveDownloadPath(supabase);
+
+    logEvent("info", "supabase_download_path_resolved", {
+      requestId,
+      bucketName,
+      downloadPath
+    });
 
     // TODO: Persist this signed URL/token request if download auditing is needed.
     const { data, error } = await supabase.storage
@@ -300,7 +412,8 @@ exports.handler = async (event) => {
       .createSignedUrl(downloadPath, signedUrlExpiresInSeconds);
 
     if (error || !data?.signedUrl) {
-      console.error("Could not create Supabase signed URL for free download", {
+      logEvent("error", "supabase_signed_url_failed", {
+        requestId,
         bucketName,
         downloadPath,
         error: error?.message
@@ -308,17 +421,42 @@ exports.handler = async (event) => {
       return jsonResponse(500, { error: "Could not create download link" });
     }
 
-    console.info("Created signed Job Cost Tracker download URL", {
+    logEvent("info", "supabase_signed_url_created", {
+      requestId,
       bucketName,
       downloadPath,
       product,
-      expiresInSeconds: signedUrlExpiresInSeconds
+      expiresInSeconds: signedUrlExpiresInSeconds,
+      hasSignedUrl: Boolean(data.signedUrl)
     });
 
-    const emailResult = await sendDownloadEmail({
-      name,
-      email,
-      downloadUrl: data.signedUrl
+    let emailResult;
+
+    try {
+      emailResult = await sendDownloadEmail({
+        name,
+        email,
+        downloadUrl: data.signedUrl,
+        requestId
+      });
+    } catch (error) {
+      logEvent("error", "email_delivery_threw", {
+        requestId,
+        error: safeError(error)
+      });
+
+      emailResult = {
+        sent: false,
+        sender: null,
+        warning: "Email delivery failed, but your download link is ready."
+      };
+    }
+
+    logEvent("info", "email_delivery_result", {
+      requestId,
+      sent: emailResult.sent,
+      sender: emailResult.sender,
+      warning: emailResult.warning
     });
 
     const responseBody = {
@@ -346,12 +484,21 @@ exports.handler = async (event) => {
       responseBody.warning = emailResult.warning || "Email delivery failed, but your download link is ready.";
     }
 
+    logEvent("info", "function_success_response", {
+      requestId,
+      success: true,
+      hasDownloadUrl: Boolean(responseBody.downloadUrl),
+      emailSent: responseBody.email.sent,
+      warning: responseBody.warning
+    });
+
     return jsonResponse(200, {
       ...responseBody
     });
   } catch (error) {
-    console.error("Unexpected free download lead function error", {
-      message: error.message
+    logEvent("error", "function_unexpected_error", {
+      requestId,
+      error: safeError(error)
     });
 
     return jsonResponse(500, { error: "Something went wrong. Please try again." });
