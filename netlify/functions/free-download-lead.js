@@ -102,42 +102,52 @@ const buildDownloadEmail = ({ name, downloadUrl }) => {
     html: `
       <!doctype html>
       <html>
-        <body style="margin:0;background:#ecfdf5;padding:32px;font-family:Arial,Helvetica,sans-serif;color:#0f172a;">
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;margin:0 auto;background:#ffffff;border:1px solid #a7f3d0;border-radius:24px;overflow:hidden;box-shadow:0 24px 60px rgba(6,95,70,.16);">
+        <body style="margin:0;padding:0;background-color:#ecfdf5;font-family:Arial,Helvetica,sans-serif;color:#0f172a;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;background-color:#ecfdf5;border-collapse:collapse;">
             <tr>
-              <td style="padding:28px 28px 18px;background:linear-gradient(135deg,#f8fffc,#d1fae5);">
-                <div style="display:inline-block;border:1px solid rgba(16,185,129,.55);border-radius:999px;padding:8px 12px;color:#065f46;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;">
-                  Cash Flow Office
-                </div>
-                <h1 style="margin:18px 0 0;font-size:30px;line-height:1.1;font-weight:500;letter-spacing:-.03em;color:#020617;">
-                  Your Job Cost Tracker is ready.
-                </h1>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:26px 28px 30px;">
-                <p style="margin:0 0 16px;font-size:16px;line-height:1.7;color:#334155;">
-                  Hi ${safeName},
-                </p>
-                <p style="margin:0 0 22px;font-size:16px;line-height:1.7;color:#334155;">
-                  Thanks for requesting the free Cash Flow Office Job Cost Tracker. Use the secure button below to download the spreadsheet.
-                </p>
-                <p style="margin:0 0 26px;font-size:14px;line-height:1.6;color:#065f46;">
-                  This secure download link expires in 10 minutes.
-                </p>
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="border-collapse:separate;">
+              <td align="center" style="padding:32px 16px;">
+                <table role="presentation" width="620" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:620px;background-color:#ffffff;border:1px solid #a7f3d0;border-radius:22px;border-collapse:separate;overflow:hidden;">
                   <tr>
-                    <td style="border-radius:999px;background:linear-gradient(135deg,#7dffd8 0%,#34F5A1 48%,#10B981 100%);box-shadow:0 18px 34px rgba(52,245,161,.32);">
-                      <a href="${safeDownloadUrl}" style="display:inline-block;border-radius:999px;padding:15px 22px;color: #061218 !important;-webkit-text-fill-color: #061218 !important;text-decoration: none !important;mso-style-priority:100 !important;font-size:15px;font-weight:800;line-height:1.2;">
-                        Download the Job Cost Tracker
-                      </a>
+                    <td style="padding:28px 28px 20px;background-color:#d1fae5;border-bottom:1px solid #a7f3d0;">
+                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="border-collapse:separate;">
+                        <tr>
+                          <td style="border:1px solid #10b981;border-radius:999px;background-color:#f0fdf4;padding:8px 12px;font-size:11px;line-height:13px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#065f46;">
+                            Cash Flow Office
+                          </td>
+                        </tr>
+                      </table>
+                      <h1 style="margin:18px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:30px;line-height:34px;font-weight:500;color:#020617;">
+                        Your Job Cost Tracker is ready.
+                      </h1>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding:26px 28px 30px;background-color:#ffffff;">
+                      <p style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:27px;color:#334155;">
+                        Hi ${safeName},
+                      </p>
+                      <p style="margin:0 0 22px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:27px;color:#334155;">
+                        Thanks for requesting the free Cash Flow Office Job Cost Tracker. Use the secure button below to download the spreadsheet.
+                      </p>
+                      <p style="margin:0 0 26px;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:#065f46;">
+                        This secure download link expires in 10 minutes.
+                      </p>
+                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="border-collapse:separate;">
+                        <tr>
+                          <td align="center" bgcolor="#064e3b" style="background-color:#064e3b;border:1px solid #047857;border-radius:999px;">
+                            <a href="${safeDownloadUrl}" style="display:inline-block;padding:15px 24px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:18px;font-weight:800;color:#f8fffc !important;-webkit-text-fill-color:#f8fffc !important;text-decoration:none !important;mso-style-priority:100 !important;border-radius:999px;">
+                              Download the Job Cost Tracker
+                            </a>
+                          </td>
+                        </tr>
+                      </table>
+                      <p style="margin:26px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:21px;color:#64748b;">
+                        If the button does not work, copy and paste this link into your browser:<br>
+                        <a href="${safeDownloadUrl}" style="color:#047857;text-decoration:underline;word-break:break-all;">${safeDownloadUrl}</a>
+                      </p>
                     </td>
                   </tr>
                 </table>
-                <p style="margin:26px 0 0;font-size:13px;line-height:1.6;color:#64748b;">
-                  If the button does not work, copy and paste this link into your browser:<br>
-                  <a href="${safeDownloadUrl}" style="color:#047857;word-break:break-all;">${safeDownloadUrl}</a>
-                </p>
               </td>
             </tr>
           </table>
