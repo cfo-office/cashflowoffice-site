@@ -1296,6 +1296,36 @@
       </div>
     </div>
 
+    <div id="paid-download-modal" class="cfo-lead-modal" hidden aria-hidden="true">
+      <div class="cfo-lead-modal__panel" role="dialog" aria-modal="true" aria-labelledby="paid-download-modal-title">
+        <div class="cfo-lead-modal__body">
+          <button type="button" class="cfo-lead-modal__close" data-paid-download-close aria-label="Close paid download">
+            <iconify-icon icon="solar:close-circle-linear" stroke-width="1.5" class="text-xl"></iconify-icon>
+          </button>
+
+          <div class="cfo-lead-modal__eyebrow">Bundle ready</div>
+          <h2 id="paid-download-modal-title" class="cfo-lead-modal__title">
+            Your Cash Flow Office Bundle is ready.
+          </h2>
+          <p class="cfo-lead-modal__copy">
+            Your secure download link is available below and has also been sent to your email.
+          </p>
+          <p class="cfo-lead-modal__copy">
+            This secure download link expires in 24 hours.
+          </p>
+
+          <div class="cfo-lead-modal__success">
+            <div id="paid-download-status" aria-live="polite">
+              Preparing your secure download link...
+            </div>
+            <a id="paid-download-now" class="cfo-lead-modal__download" href="#" target="_blank" rel="noopener" aria-disabled="true">
+              Download Your Cash Flow Office Bundle
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script>
       const scenarios = {
         draw: {
@@ -1372,6 +1402,10 @@
       const freeDownloadNameError = document.getElementById("free-download-name-error");
       const freeDownloadEmailError = document.getElementById("free-download-email-error");
       let freeDownloadLastFocus = null;
+      const paidDownloadModal = document.getElementById("paid-download-modal");
+      const paidDownloadStatus = document.getElementById("paid-download-status");
+      const paidDownloadNow = document.getElementById("paid-download-now");
+      let paidDownloadLastFocus = null;
 
       const isValidLeadEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -1406,6 +1440,64 @@
         }
       };
 
+      const resetPaidDownloadModal = () => {
+        paidDownloadStatus.textContent = "Preparing your secure download link...";
+        paidDownloadNow.href = "#";
+        paidDownloadNow.setAttribute("aria-disabled", "true");
+        paidDownloadNow.style.pointerEvents = "none";
+        paidDownloadNow.style.opacity = ".72";
+      };
+
+      const openPaidDownloadModal = () => {
+        paidDownloadLastFocus = document.activeElement;
+        resetPaidDownloadModal();
+        paidDownloadModal.hidden = false;
+        paidDownloadModal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+      };
+
+      const closePaidDownloadModal = () => {
+        paidDownloadModal.hidden = true;
+        paidDownloadModal.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+        if (paidDownloadLastFocus && typeof paidDownloadLastFocus.focus === "function") {
+          paidDownloadLastFocus.focus();
+        }
+      };
+
+      const loadPaidBundleDownload = async (sessionId) => {
+        try {
+          const response = await fetch("/.netlify/functions/paid-download-session", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              session_id: sessionId
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error("Paid download session request failed");
+          }
+
+          const result = await response.json();
+
+          if (!result.downloadUrl) {
+            throw new Error("Paid download URL missing from response");
+          }
+
+          paidDownloadNow.href = result.downloadUrl;
+          paidDownloadNow.removeAttribute("aria-disabled");
+          paidDownloadNow.style.pointerEvents = "";
+          paidDownloadNow.style.opacity = "";
+          paidDownloadStatus.textContent = "Your secure download link is ready.";
+        } catch (error) {
+          console.error("Cash Flow Office paid download link failed", error);
+          paidDownloadStatus.textContent = "Something went wrong preparing your download link. Please check your email or contact support.";
+        }
+      };
+
       document.querySelectorAll(".js-free-download").forEach((link) => {
         link.addEventListener("click", (event) => {
           event.preventDefault();
@@ -1417,15 +1509,34 @@
         button.addEventListener("click", closeFreeDownloadModal);
       });
 
+      document.querySelectorAll("[data-paid-download-close]").forEach((button) => {
+        button.addEventListener("click", closePaidDownloadModal);
+      });
+
       freeDownloadModal.addEventListener("click", (event) => {
         if (event.target === freeDownloadModal) {
           closeFreeDownloadModal();
         }
       });
 
+      paidDownloadModal.addEventListener("click", (event) => {
+        if (event.target === paidDownloadModal) {
+          closePaidDownloadModal();
+        }
+      });
+
+      paidDownloadNow.addEventListener("click", (event) => {
+        if (paidDownloadNow.getAttribute("aria-disabled") === "true") {
+          event.preventDefault();
+        }
+      });
+
       document.addEventListener("keydown", (event) => {
         if (event.key === "Escape" && !freeDownloadModal.hidden) {
           closeFreeDownloadModal();
+        }
+        if (event.key === "Escape" && !paidDownloadModal.hidden) {
+          closePaidDownloadModal();
         }
       });
 
@@ -1531,6 +1642,14 @@
           }
         });
       });
+
+      const purchaseParams = new URLSearchParams(window.location.search);
+      const purchaseSessionId = purchaseParams.get("session_id");
+
+      if (purchaseParams.get("purchase") === "success" && purchaseSessionId) {
+        openPaidDownloadModal();
+        loadPaidBundleDownload(purchaseSessionId);
+      }
     </script>
   
 </body></html>

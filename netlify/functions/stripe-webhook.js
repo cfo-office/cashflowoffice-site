@@ -8,25 +8,7 @@ const signedUrlExpiresInSeconds = 24 * 60 * 60;
 const resendEndpoint = "https://api.resend.com/emails";
 const sender = "Cash Flow Office <downloads@cashflowoffice.com>";
 const emailSubject = "Your Cash Flow Office Weekly Finance Bundle Is Ready";
-
-const paidBundleFiles = [
-  {
-    label: "Weekly Cash Flow Planner",
-    path: "CashFlowOffice_WeeklyCashFlowPlanner.xlsx"
-  },
-  {
-    label: "Payment Scheduler",
-    path: "CashFlowOffice_PaymentScheduler.xlsx"
-  },
-  {
-    label: "Vendor + Subcontractor Manager",
-    path: "CashFlowOffice_VendorSubcontractorManager.xlsx"
-  },
-  {
-    label: "Job Cost Tracker",
-    path: "CashFlowOffice_JobCostTracker_Final.xlsx"
-  }
-];
+const paidBundlePath = "CFO BUNDLE.zip";
 
 const jsonResponse = (statusCode, body) => ({
   statusCode,
@@ -91,76 +73,29 @@ const getSupabaseClient = (requestId) => {
   });
 };
 
-const createSignedDownloads = async ({ supabase, requestId }) => {
-  const downloads = [];
+const createSignedDownload = async ({ supabase, requestId }) => {
+  const { data, error } = await supabase.storage
+    .from(bucketName)
+    .createSignedUrl(paidBundlePath, signedUrlExpiresInSeconds);
 
-  for (const file of paidBundleFiles) {
-    const { data, error } = await supabase.storage
-      .from(bucketName)
-      .createSignedUrl(file.path, signedUrlExpiresInSeconds);
-
-    if (error || !data?.signedUrl) {
-      throw new Error(`Could not create signed URL for ${file.path}: ${error?.message || "missing signed URL"}`);
-    }
-
-    downloads.push({
-      ...file,
-      url: data.signedUrl
-    });
+  if (error || !data?.signedUrl) {
+    throw new Error(`Could not create signed URL for ${paidBundlePath}: ${error?.message || "missing signed URL"}`);
   }
 
   logEvent("info", "paid_bundle_signed_urls_created", {
     requestId,
     bucketName,
-    fileCount: downloads.length,
+    fileCount: 1,
     expiresInSeconds: signedUrlExpiresInSeconds,
-    filePaths: downloads.map((download) => download.path)
+    filePaths: [paidBundlePath]
   });
 
-  return downloads;
+  return data.signedUrl;
 };
 
-const buildButtonRows = (downloads) => {
-  return downloads.map((download) => {
-    const safeLabel = escapeHtml(download.label);
-    const safeUrl = escapeHtml(download.url);
-
-    return `
-      <tr>
-        <td style="padding:0 0 12px;">
-          <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="border-collapse:separate;">
-            <tr>
-              <td align="center" bgcolor="#064e3b" style="background-color:#064e3b;border:1px solid #047857;border-radius:999px;">
-                <a href="${safeUrl}" style="display:inline-block;padding:14px 22px;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:18px;font-weight:800;color:#f8fffc !important;-webkit-text-fill-color:#f8fffc !important;text-decoration:none !important;mso-style-priority:100 !important;border-radius:999px;">
-                  Download ${safeLabel}
-                </a>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    `;
-  }).join("");
-};
-
-const buildFallbackLinks = (downloads) => {
-  return downloads.map((download) => {
-    const safeLabel = escapeHtml(download.label);
-    const safeUrl = escapeHtml(download.url);
-
-    return `
-      <tr>
-        <td style="padding:0 0 12px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:21px;color:#64748b;">
-          <strong style="color:#334155;">${safeLabel}:</strong><br>
-          <a href="${safeUrl}" style="color:#047857;text-decoration:underline;word-break:break-all;">${safeUrl}</a>
-        </td>
-      </tr>
-    `;
-  }).join("");
-};
-
-const buildFulfillmentEmail = ({ name, downloads }) => {
+const buildFulfillmentEmail = ({ name, downloadUrl }) => {
   const safeName = escapeHtml(name || "there");
+  const safeDownloadUrl = escapeHtml(downloadUrl);
 
   return {
     html: `
@@ -191,20 +126,24 @@ const buildFulfillmentEmail = ({ name, downloads }) => {
                         Hi ${safeName},
                       </p>
                       <p style="margin:0 0 22px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:27px;color:#334155;">
-                        Thanks for purchasing the Cash Flow Office Weekly Finance Bundle. Your secure download links are below.
+                        Thanks for purchasing the Cash Flow Office Weekly Finance Bundle. Use the secure button below to download your bundle.
                       </p>
                       <p style="margin:0 0 26px;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:#065f46;">
-                        These secure download links expire in 24 hours.
+                        This secure download link expires in 24 hours.
                       </p>
-                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="border-collapse:collapse;">
-                        ${buildButtonRows(downloads)}
+                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="border-collapse:separate;">
+                        <tr>
+                          <td align="center" bgcolor="#064e3b" style="background-color:#064e3b;border:1px solid #047857;border-radius:999px;">
+                            <a href="${safeDownloadUrl}" style="display:inline-block;padding:15px 24px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:18px;font-weight:800;color:#f8fffc !important;-webkit-text-fill-color:#f8fffc !important;text-decoration:none !important;mso-style-priority:100 !important;border-radius:999px;">
+                              Download Your Cash Flow Office Bundle
+                            </a>
+                          </td>
+                        </tr>
                       </table>
-                      <p style="margin:18px 0 14px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:21px;color:#64748b;">
-                        If a button does not work, copy and paste the matching link into your browser:
+                      <p style="margin:26px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:21px;color:#64748b;">
+                        If the button does not work, copy and paste this link into your browser:<br>
+                        <a href="${safeDownloadUrl}" style="color:#047857;text-decoration:underline;word-break:break-all;">${safeDownloadUrl}</a>
                       </p>
-                      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;border-collapse:collapse;">
-                        ${buildFallbackLinks(downloads)}
-                      </table>
                     </td>
                   </tr>
                 </table>
@@ -214,7 +153,7 @@ const buildFulfillmentEmail = ({ name, downloads }) => {
         </body>
       </html>
     `,
-    text: `Hi ${name || "there"},\n\nThanks for purchasing the Cash Flow Office Weekly Finance Bundle. Your secure download links are below.\n\nThese links expire in 24 hours.\n\n${downloads.map((download) => `${download.label}: ${download.url}`).join("\n")}\n\nCash Flow Office`
+    text: `Hi ${name || "there"},\n\nThanks for purchasing the Cash Flow Office Weekly Finance Bundle.\n\nYour secure download link expires in 24 hours:\n${downloadUrl}\n\nCash Flow Office`
   };
 };
 
@@ -232,14 +171,14 @@ const parseResendResponse = async (response) => {
   }
 };
 
-const sendFulfillmentEmail = async ({ email, name, downloads, requestId }) => {
+const sendFulfillmentEmail = async ({ email, name, downloadUrl, requestId }) => {
   const resendApiKey = process.env.RESEND_API_KEY;
 
   if (!resendApiKey) {
     throw new Error("RESEND_API_KEY is not configured.");
   }
 
-  const emailContent = buildFulfillmentEmail({ name, downloads });
+  const emailContent = buildFulfillmentEmail({ name, downloadUrl });
   const payload = {
     from: sender,
     to: email,
@@ -268,7 +207,7 @@ const sendFulfillmentEmail = async ({ email, name, downloads, requestId }) => {
     resendId: body.id,
     sender,
     recipientDomain: email.split("@")[1],
-    downloadCount: downloads.length
+    downloadCount: 1
   });
 
   return body;
@@ -314,11 +253,11 @@ const handleCheckoutSessionCompleted = async ({ session, requestId }) => {
     throw new Error("Supabase is not configured.");
   }
 
-  const downloads = await createSignedDownloads({ supabase, requestId });
+  const downloadUrl = await createSignedDownload({ supabase, requestId });
   await sendFulfillmentEmail({
     email,
     name,
-    downloads,
+    downloadUrl,
     requestId
   });
 };
