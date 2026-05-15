@@ -28,7 +28,21 @@ Use this checklist before publishing or uploading any Cash Flow Office spreadshe
 - Confirm any known limitations or remaining manual review items are documented.
 - Confirm no QC report files are included in the release ZIP.
 
-## 4. Release Package Build
+## 4. Automated Workbook Audit
+
+- [x] Audit script created.
+- [x] Audit script run.
+- [x] JSON audit report generated.
+- [x] Markdown audit report generated.
+- [x] Formula cells scanned.
+- [x] Protection scanned.
+- [x] Data validation scanned.
+- [x] Conditional formatting scanned.
+- [x] Hidden sheets scanned.
+- [x] External links scanned.
+- [x] Manual scenario testing still required.
+
+## 5. Release Package Build
 
 - Confirm the customer-facing ZIP is stored only in `digital-products/release/`.
 - Confirm the release ZIP includes only customer-facing Excel files.
@@ -36,11 +50,10 @@ Use this checklist before publishing or uploading any Cash Flow Office spreadshe
 - Confirm the release ZIP opens successfully on a clean machine.
 - Confirm each workbook can be opened directly after extracting the ZIP.
 
-## 5. Final Repository Check
+## 6. Final Repository Check
 
 - Run `git status`.
 - Confirm changed files are expected.
 - Confirm Excel workbook content was not changed by release packaging unless intentionally reviewed.
 - Confirm the checklist, QC audit, and release ZIP are ready to commit when approved.
 - Do not commit or publish until the product owner approves the release package.
-
