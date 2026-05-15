@@ -11,7 +11,7 @@ const allowedTopics = new Set([
 const sourceValue = "cashflowoffice-homepage-contact";
 const resendEndpoint = "https://api.resend.com/emails";
 const sender = "Cash Flow Office <downloads@cashflowoffice.com>";
-const contactRecipient = "darlene@cashflowoffice.com";
+const contactRecipient = "DarleneM@cashflowoffice.com";
 const contactEmailSubject = "New Cash Flow Office contact message";
 
 const jsonResponse = (statusCode, body, headers = {}) => ({
